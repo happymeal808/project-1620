@@ -23,6 +23,7 @@ yarn-error.log*
 # IDE/editor settings
 .vscode/
 .idea/
+.env
 *.swp
 *.swo
 
