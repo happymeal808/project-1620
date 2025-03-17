@@ -1,3 +1,11 @@
+// colour palette <3
+
 $background-main: pink;
 $background-header: orange;
 $background-footer: lightblue;
+
+// fonts 
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Karla:ital,wght@0,200..800;1,200..800&display=swap');
+
+$header-font: "Karla", sans-serif;
+$body-font: "Inconsolata", monospace;
