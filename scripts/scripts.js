@@ -1,6 +1,4 @@
 const apiUrl = 'http://localhost:3001/api/fonts';
-
-// Global lock pairs
 let fontLockPairs = [];
 let colorLockPairs = [];
 
