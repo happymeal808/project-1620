@@ -3,30 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Generator</title>
+    <title>Style Generator</title>
     <link rel="stylesheet" href="styles/styles.css">
     <script src="scripts/scripts.js"></script>
 </head>
 <body>
     <header>
-        <h2>style finder</h2>
+        <h1 class="header-font">Style Finder</h1>
     </header>
     <main>
-        <h1 id="header-font">hey there</h1>
-        <p id="sub-header-font">hope you're taking care</p>
-        <p id="body-font">you look healthy</p>
+        <h2 id="header-font" class="header-font">Hey there.</h2>
+        <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
+        <h3 id="sub-header-font" class="sub-header-font">Hope you're taking care.</h3>
+        <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
+        <p id="body-font" class="body-font">Love & Light</p>
+        <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
         <section class="colors">
-            <span id="color-1"></span>
-            <span id="color-2"></span>
-            <span id="color-3"></span>
-            <span id="color-4"></span>
-            <span id="color-5"></span>
+            <div>
+                <span class="color-block">#HEX</span>
+                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+              </div>
+            <div>
+                <span class="color-block"></span>
+                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+            </div>
+            <div>
+                <span class="color-block"></span>
+                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+            </div>
+            <div>
+                <span class="color-block"></span>
+                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+            </div>
+            <div>
+                <span class="color-block"></span>
+                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+            </div>
         </section>
+        <button id="randomizer">try something new</button>
     </main>
     <footer>
         <ul>
-            <li>For educational purposes</li>
-            <li>Cooked with luv by Ashen, Taylor, & Gillian</li>
+            <li class="body-font">For educational purposes</li>
+            <li class="body-font">Crafted with luv by Ashen, Taylor, & Gill</li>
         </ul>
     </footer>
 </body>
