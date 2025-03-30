@@ -88,45 +88,66 @@ function applyFont(elements, fontObj) {
 // === COLOR LOGIC ===
 
 function getRandomBaseColor() {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 65 + Math.random() * 25;
-  const lightness = 45 + Math.random() * 15;
-  return { hue, saturation, lightness };
-}
+    const hue = Math.floor(Math.random() * 360);           // full color wheel
+    const saturation = 70 + Math.random() * 20;             // 70–90% (vibrant)
+    const lightness = 50 + Math.random() * 10;              // 50–60% (medium)
+    return { hue, saturation, lightness };
+  }
 
-function generateColorPalette(baseHue, saturation, lightness) {
-  const offsets = [0, 150, 210, 30, 330];
-  return offsets.map(offset => {
-    const hue = (baseHue + offset) % 360;
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  });
-}
-
-function applyColors() {
-  const base = getRandomBaseColor();
-  const colors = generateColorPalette(base.hue, base.saturation, base.lightness);
-
-  colorLockPairs.forEach(({ block, button }, index) => {
-    const isLocked = button.dataset.locked === 'true';
-    if (!isLocked && block) {
-      const color = colors[index % colors.length];
-      block.style.backgroundColor = color;
-      block.textContent = hslToHex(color);
-      block.style.color = getContrastColor(color);
+  function generateColorPalette(baseHue) {
+    const palette = [];
+  
+    // Vibrant hues
+    const vibrantOffsets = [0, 30, 180];
+    vibrantOffsets.forEach(offset => {
+      const hue = (baseHue + offset) % 360;
+      const saturation = 70 + Math.random() * 20;  // 70–90%
+      const lightness = 50 + Math.random() * 10;   // 50–60%
+      palette.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+    });
+  
+    // Neutrals (low saturation)
+    for (let i = 0; i < 2; i++) {
+      const lightness = 20 + Math.random() * 60;   // 20–80% range
+      const saturation = 0 + Math.random() * 10;   // 0–10% sat = neutral
+      palette.push(`hsl(${Math.floor(Math.random() * 360)}, ${saturation}%, ${lightness}%)`);
     }
-  });
-}
+  
+    return palette;
+  }
+
+  function getRandomBaseColor() {
+    return {
+      hue: Math.floor(Math.random() * 360)
+    };
+  }
+
+  function applyColors() {
+    const base = getRandomBaseColor();
+    const colors = generateColorPalette(base.hue);
+  
+    colorLockPairs.forEach(({ block, button }, index) => {
+      if (button.dataset.locked !== 'true' && block) {
+        const color = colors[index % colors.length];
+        block.style.backgroundColor = color;
+        block.style.color = getContrastColor(color);
+        block.textContent = ''; // no text inside
+      }
+    });
+  }
 
 function hslToHex(hslString) {
-  const [h, s, l] = hslString.match(/\d+/g).map(Number);
-  const a = s * Math.min(l, 100 - l) / 100;
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color).toString(16).padStart(2, '0');
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
-}
+    const [h, s, l] = hslString.match(/\d+/g).map(Number);
+  
+    const a = s * Math.min(l, 100 - l) / 100;
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+  
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
 
 function getContrastColor(hslString) {
   const lightness = parseInt(hslString.match(/\d+/g)[2]);
