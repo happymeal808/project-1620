@@ -111,7 +111,6 @@ function applyColors() {
     if (!isLocked && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
-      block.textContent = hslToHex(color);
       block.style.color = getContrastColor(color);
     }
   });
