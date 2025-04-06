@@ -21,23 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return { block, button };
   });
 
-  // === Initialize lock states + attach toggle ===
-  [...fontLockPairs, ...colorLockPairs].forEach(({ button }) => {
-    if (!button.dataset.locked) {
-      button.dataset.locked = 'false';
-    }
-
-
-    button.addEventListener('click', () => toggleLock(button));
-  });
-
-  colorLockPairs.forEach(({ button }) => {
-  if (!button.dataset.locked) {
-    button.dataset.locked = 'false';
-  }
-
-  button.addEventListener('click', (e) => toggleLock(e.currentTarget));
-});
+  // === Initialize lock states + attach toggle for all lock buttons ===
+  fontLockPairs.forEach(({ button }) => initializeLock(button));
+  colorLockPairs.forEach(({ button }) => initializeLock(button));
 
   // === Randomizer Button ===
   document.getElementById('randomizer').addEventListener('click', () => {
@@ -47,22 +33,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const fonts = data.items;
         const randomFonts = getRandomFonts(fonts, fontLockPairs.length);
 
+        // Only update unlocked font groups
         fontLockPairs.forEach(({ button, elements }, index) => {
           if (button.dataset.locked !== 'true') {
             applyFont(elements, randomFonts[index]);
           }
         });
 
+        // Only update unlocked color blocks
         applyColors();
-      });
+      })
+      .catch(err => console.error('Font API fetch failed:', err));
   });
 });
+
+// === LOCK INITIALIZATION ===
+
+function initializeLock(button) {
+  if (!button.dataset.locked) {
+    button.dataset.locked = 'false';
+  }
+  button.addEventListener('click', () => toggleLock(button));
+}
 
 // === FONT LOGIC ===
 
 function getRandomFonts(fontList, count) {
-  const shuffled = fontList.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+  // Fisher-Yates Shuffle
+  const array = [...fontList];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array.slice(0, count);
 }
 
 function applyFont(elements, fontObj) {
@@ -75,9 +78,16 @@ function applyFont(elements, fontObj) {
     const linkTag = document.createElement('link');
     linkTag.href = fontHref;
     linkTag.rel = 'stylesheet';
+
+    // Optional: add basic onerror fail-safe
+    linkTag.onerror = () => {
+      console.error(`Failed to load font: ${fontName}`);
+    };
+
     document.head.appendChild(linkTag);
   }
 
+  // Apply font to all matched elements
   Array.from(elements).forEach(el => {
     if (el && el.style) {
       el.style.fontFamily = `'${fontName}', sans-serif`;
@@ -111,7 +121,10 @@ function applyColors() {
     if (!isLocked && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
-      block.style.color = getContrastColor(color);
+      block.style.color = getContrastColor(color); // Ensure legibility
+
+      // Optional enhancement: display hex code below or on hover
+      // block.dataset.hex = hslToHex(color);
     }
   });
 }
@@ -135,10 +148,12 @@ function getContrastColor(hslString) {
 // === LOCK TOGGLE ===
 
 function toggleLock(button) {
-    const img = button.querySelector('img');
-    const isLocked = button.dataset.locked === 'true';
-  
-    button.dataset.locked = (!isLocked).toString();
-    img.src = isLocked ? 'icons/unlock.svg' : 'icons/lock.svg';
-    img.alt = isLocked ? 'unlock icon' : 'lock icon';
-  }
+  const img = button.querySelector('img');
+  const isLocked = button.dataset.locked === 'true';
+
+  button.dataset.locked = (!isLocked).toString();
+  button.setAttribute('aria-pressed', (!isLocked).toString()); // Accessibility
+
+  img.src = isLocked ? 'icons/unlock.svg' : 'icons/lock.svg';
+  img.alt = isLocked ? 'unlock icon' : 'lock icon';
+}
