@@ -26,6 +26,8 @@ body{
     transition: box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
+    font-family: "Chicago", sans-serif;
+    font-weight: 300;
 
     &:hover {
         box-shadow: 0.25rem 0.25rem 0 #0003;
