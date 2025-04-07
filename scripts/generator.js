@@ -3,53 +3,34 @@ let fontLockPairs = [];
 let colorLockPairs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-// === FONT PAIRS ===
-  const fontLockButtons = Array.from(document.getElementsByClassName('lock'))
-    .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/));
+  // === FONT PAIRS ===
+  fontLockPairs = Array.from(document.getElementsByClassName('lock'))
+    .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/))
+    .map(button => {
+      const target = button.previousElementSibling;
+      const className = target.classList[0];
+      const elements = document.getElementsByClassName(className);
+      return { button, elements };
+    });
 
-  fontLockPairs = fontLockButtons.map(button => {
-    const target = button.previousElementSibling;
-    const className = target.classList[0];
-    const elements = document.getElementsByClassName(className);
-    return { button, elements };
-  });
-
-// === COLOR PAIRS ===
+  // === COLOR PAIRS ===
   colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
     const block = wrapper.querySelector('.color-block');
     const button = wrapper.querySelector('.lock');
     return { block, button };
   });
 
+  // Initialize lock states + attach toggle for all lock buttons
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-// === randomizer ===
-  document.getElementById('randomizer').addEventListener('click', () => {
-    fetch(apiUrl)
-      .then(res => res.json())
-      .then(data => {
-        const fonts = data.items;
-        const randomFonts = getRandomFonts(fonts, fontLockPairs.length);
-
-        fontLockPairs.forEach(({ button, elements }, index) => {
-          if (button.dataset.locked !== 'true') {
-            applyFont(elements, randomFonts[index]);
-          }
-        });
-
-        applyColors();
-      })
-      .catch(err => console.error('Font API fetch failed:', err));
-  });
+  // === Randomizer Button ===
+  document.getElementById('randomizer').addEventListener('click', handleRandomizerClick);
 });
 
-// === LOCK ===
-
+// === LOCK INITIALIZATION ===
 function initializeLock(button) {
-  if (!button.dataset.locked) {
-    button.dataset.locked = 'false';
-  }
+  if (!button.dataset.locked) button.dataset.locked = 'false';
   button.addEventListener('click', () => toggleLock(button));
 }
 
@@ -69,6 +50,7 @@ function applyFont(elements, fontObj) {
   const fontName = fontObj.family;
   const fontHref = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
 
+  // Only add the <link> tag if not already present
   if (!document.querySelector(`link[href="${fontHref}"]`)) {
     const linkTag = document.createElement('link');
     linkTag.href = fontHref;
@@ -76,6 +58,7 @@ function applyFont(elements, fontObj) {
     document.head.appendChild(linkTag);
   }
 
+  // Apply the font to all matched elements
   Array.from(elements).forEach(el => {
     if (el && el.style) {
       el.style.fontFamily = `'${fontName}', sans-serif`;
@@ -84,11 +67,9 @@ function applyFont(elements, fontObj) {
 }
 
 // === COLOR LOGIC ===
-
 function getColorTheoryPalette() {
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 60 + Math.random() * 30;
-
   const schemes = {
     complementary: [0, 180, 30, 210, 60],
     triadic: [0, 120, 240, 60, 300],
@@ -96,10 +77,9 @@ function getColorTheoryPalette() {
     tetradic: [0, 90, 180, 270, 135]
   };
 
-  const schemeNames = Object.keys(schemes);
-  const selected = schemes[schemeNames[Math.floor(Math.random() * schemeNames.length)]];
+  const selectedScheme = schemes[Object.keys(schemes)[Math.floor(Math.random() * Object.keys(schemes).length)]];
 
-  const palette = selected.map((offset, i) => {
+  return selectedScheme.map((offset, i) => {
     const hue = (baseHue + offset + 360) % 360;
     const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
 
@@ -109,35 +89,20 @@ function getColorTheoryPalette() {
       case 1: light = 85 + Math.random() * 5; break;
       default: light = 45 + Math.random() * 25; break;
     }
-
     return `hsl(${hue}, ${sat}%, ${light}%)`;
   });
-
-  return [...new Set(palette)];
 }
 
 function applyColors() {
   const colors = getColorTheoryPalette();
 
   colorLockPairs.forEach(({ block, button }, index) => {
-    const isLocked = button.dataset.locked === 'true';
-    if (!isLocked && block) {
+    if (button.dataset.locked !== 'true' && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
       block.style.color = getContrastColor(color);
     }
   });
-}
-
-function hslToHex(hslString) {
-  const [h, s, l] = hslString.match(/\d+/g).map(Number);
-  const a = s * Math.min(l, 100 - l) / 100;
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color).toString(16).padStart(2, '0');
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
 }
 
 function getContrastColor(hslString) {
@@ -146,7 +111,6 @@ function getContrastColor(hslString) {
 }
 
 // === LOCK TOGGLE ===
-
 function toggleLock(button) {
   const img = button.querySelector('img');
   const isLocked = button.dataset.locked === 'true';
@@ -156,4 +120,23 @@ function toggleLock(button) {
 
   img.src = isLocked ? 'icons/unlock.svg' : 'icons/lock.svg';
   img.alt = isLocked ? 'unlock icon' : 'lock icon';
+}
+
+// === RANDOMIZER HANDLER ===
+function handleRandomizerClick() {
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+      const fonts = data.items;
+      const randomFonts = getRandomFonts(fonts, fontLockPairs.length);
+
+      fontLockPairs.forEach(({ button, elements }, index) => {
+        if (button.dataset.locked !== 'true') {
+          applyFont(elements, randomFonts[index]);
+        }
+      });
+
+      applyColors();
+    })
+    .catch(err => console.error('Font API fetch failed:', err));
 }
