@@ -3,7 +3,7 @@ let fontLockPairs = [];
 let colorLockPairs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // === FONT PAIRS ===
+// === FONT PAIRS ===
   const fontLockButtons = Array.from(document.getElementsByClassName('lock'))
     .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/));
 
@@ -14,18 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return { button, elements };
   });
 
-  // === COLOR PAIRS ===
+// === COLOR PAIRS ===
   colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
     const block = wrapper.querySelector('.color-block');
     const button = wrapper.querySelector('.lock');
     return { block, button };
   });
 
-  // === Initialize lock states + attach toggle for all lock buttons ===
+// === Initialize lock states + attach toggle for all lock buttons ===
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-  // === Randomizer Button ===
+// === Randomizer Button ===
   document.getElementById('randomizer').addEventListener('click', () => {
     fetch(apiUrl)
       .then(res => res.json())
@@ -33,14 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const fonts = data.items;
         const randomFonts = getRandomFonts(fonts, fontLockPairs.length);
 
-        // Only update unlocked font groups
+// Only update unlocked font groups
         fontLockPairs.forEach(({ button, elements }, index) => {
           if (button.dataset.locked !== 'true') {
             applyFont(elements, randomFonts[index]);
           }
         });
 
-        // Only update unlocked color blocks
+// Only update unlocked color blocks
         applyColors();
       })
       .catch(err => console.error('Font API fetch failed:', err));
@@ -57,9 +57,8 @@ function initializeLock(button) {
 }
 
 // === FONT LOGIC ===
-
 function getRandomFonts(fontList, count) {
-  // Fisher-Yates Shuffle
+// shuffle
   const array = [...fontList];
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -78,13 +77,6 @@ function applyFont(elements, fontObj) {
     const linkTag = document.createElement('link');
     linkTag.href = fontHref;
     linkTag.rel = 'stylesheet';
-
-    // Optional: add basic onerror fail-safe
-    linkTag.onerror = () => {
-      console.error(`Failed to load font: ${fontName}`);
-    };
-
-    document.head.appendChild(linkTag);
   }
 
   // Apply font to all matched elements
@@ -97,34 +89,47 @@ function applyFont(elements, fontObj) {
 
 // === COLOR LOGIC ===
 
-function getRandomBaseColor() {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 65 + Math.random() * 25;
-  const lightness = 45 + Math.random() * 15;
-  return { hue, saturation, lightness };
-}
+function getColorTheoryPalette() {
+  const baseHue = Math.floor(Math.random() * 360);
+  const saturation = 60 + Math.random() * 30;
 
-function generateColorPalette(baseHue, saturation, lightness) {
-  const offsets = [0, 150, 210, 30, 330];
-  return offsets.map(offset => {
-    const hue = (baseHue + offset) % 360;
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  const schemes = {
+    complementary: [0, 180, 30, 210, 60],
+    triadic: [0, 120, 240, 60, 300],
+    analogous: [-30, 0, 30, 60, 90],
+    tetradic: [0, 90, 180, 270, 135]
+  };
+
+  const schemeNames = Object.keys(schemes);
+  const selected = schemes[schemeNames[Math.floor(Math.random() * schemeNames.length)]];
+
+  const palette = selected.map((offset, i) => {
+    const hue = (baseHue + offset + 360) % 360;
+    const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
+
+    // Add a wider lightness range, especially at the extremes
+    let light;
+    switch (i) {
+      case 0: light = 20 + Math.random() * 10; break; // dark
+      case 1: light = 85 + Math.random() * 5; break;  // light
+      default: light = 45 + Math.random() * 25; break; // mid
+    }
+
+    return `hsl(${hue}, ${sat}%, ${light}%)`;
   });
+
+  return [...new Set(palette)];
 }
 
 function applyColors() {
-  const base = getRandomBaseColor();
-  const colors = generateColorPalette(base.hue, base.saturation, base.lightness);
+  const colors = getColorTheoryPalette();
 
   colorLockPairs.forEach(({ block, button }, index) => {
     const isLocked = button.dataset.locked === 'true';
     if (!isLocked && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
-      block.style.color = getContrastColor(color); // Ensure legibility
-
-      // Optional enhancement: display hex code below or on hover
-      // block.dataset.hex = hslToHex(color);
+      block.style.color = getContrastColor(color);
     }
   });
 }
@@ -152,7 +157,7 @@ function toggleLock(button) {
   const isLocked = button.dataset.locked === 'true';
 
   button.dataset.locked = (!isLocked).toString();
-  button.setAttribute('aria-pressed', (!isLocked).toString()); // Accessibility
+  button.setAttribute('aria-pressed', (!isLocked).toString());
 
   img.src = isLocked ? 'icons/unlock.svg' : 'icons/lock.svg';
   img.alt = isLocked ? 'unlock icon' : 'lock icon';
