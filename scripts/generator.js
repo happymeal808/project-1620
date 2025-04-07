@@ -88,7 +88,6 @@ function getColorTheoryPalette() {
 
     const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
 
-    // Lightness
     let light;
     switch (i) {
       case 0:
