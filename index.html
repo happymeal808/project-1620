@@ -7,59 +7,65 @@
     <link rel="stylesheet" href="styles/normalize.css">
     <link rel="stylesheet" href="styles/styles.css">
     <script src="scripts/generator.js"></script>
-    <script src="scripts/music.js"></script>
 </head>
 <body>
     <header>
         <h1>Style Finder</h1>
         <span class="spacer">
-            <i line></i>
-            <i line></i>
-            <i line></i>
+            <i class="line"></i>
+            <i class="line"></i>
+            <i class="line"></i>
         </span>
     </header>
+
     <main>
         <section class="intro">
             <p>♡ generate below for a good time ♡</p>
         </section>
+
         <section class="fonts">
             <div class="header-section">
                 <h2 id="header-font" class="header-font">I write, erase, rewrite</h2>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
+                <button class="lock" aria-label="Lock header font"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
             <div class="sub-header-section">
                 <h3 id="sub-header-font" class="sub-header-font">Erase again, and then</h3>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
+                <button class="lock" aria-label="Lock sub-header font"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
             <div class="body-section">
                 <p id="body-font" class="body-font">A poppy blooms.</p>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon"></button>
+                <button class="lock" aria-label="Lock body font"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
         </section>
+
         <section class="colors">
             <div class="color">
                 <div class="color-block"></div>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
-              </div>
-            <div class="color">
-                <div class="color-block"></div>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+                <button class="lock" aria-label="Lock color block"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
             <div class="color">
                 <div class="color-block"></div>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+                <button class="lock" aria-label="Lock color block"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
             <div class="color">
                 <div class="color-block"></div>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+                <button class="lock" aria-label="Lock color block"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
             <div class="color">
                 <div class="color-block"></div>
-                <button class="lock"><img src="icons/unlock.svg" alt="lock icon" /></button>
+                <button class="lock" aria-label="Lock color block"><img src="icons/unlock.svg" alt="lock icon"></button>
+            </div>
+            <div class="color">
+                <div class="color-block"></div>
+                <button class="lock" aria-label="Lock color block"><img src="icons/unlock.svg" alt="lock icon"></button>
             </div>
         </section>
-        <button id="randomizer"><img src="icons/refresh.svg" alt="generate"></button>
+
+        <button id="randomizer" aria-label="Generate random styles">
+            <img src="icons/refresh.svg" alt="generate">
+        </button>
     </main>
+
     <footer>
         <ul>
             <li>For educational purposes</li>

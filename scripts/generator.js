@@ -3,7 +3,7 @@ let fontLockPairs = [];
 let colorLockPairs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // === FONT PAIRS ===
+// === FONT PAIRS ===
   fontLockPairs = Array.from(document.getElementsByClassName('lock'))
     .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/))
     .map(button => {
@@ -13,18 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return { button, elements };
     });
 
-  // === COLOR PAIRS ===
+// === COLOR PAIRS ===
   colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
     const block = wrapper.querySelector('.color-block');
     const button = wrapper.querySelector('.lock');
     return { block, button };
   });
 
-  // Initialize lock states + attach toggle for all lock buttons
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-  // === Randomizer Button ===
+// === Randomizer Button ===
   document.getElementById('randomizer').addEventListener('click', handleRandomizerClick);
 });
 
@@ -50,7 +49,6 @@ function applyFont(elements, fontObj) {
   const fontName = fontObj.family;
   const fontHref = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
 
-  // Only add the <link> tag if not already present
   if (!document.querySelector(`link[href="${fontHref}"]`)) {
     const linkTag = document.createElement('link');
     linkTag.href = fontHref;
@@ -58,7 +56,6 @@ function applyFont(elements, fontObj) {
     document.head.appendChild(linkTag);
   }
 
-  // Apply the font to all matched elements
   Array.from(elements).forEach(el => {
     if (el && el.style) {
       el.style.fontFamily = `'${fontName}', sans-serif`;
@@ -70,28 +67,53 @@ function applyFont(elements, fontObj) {
 function getColorTheoryPalette() {
   const baseHue = Math.floor(Math.random() * 360);
   const saturation = 60 + Math.random() * 30;
+
   const schemes = {
     complementary: [0, 180, 30, 210, 60],
     triadic: [0, 120, 240, 60, 300],
     analogous: [-30, 0, 30, 60, 90],
-    tetradic: [0, 90, 180, 270, 135]
+    tetradic: [0, 90, 180, 270, 135],
+    earthy: [30, 40, 50, 70]
   };
 
-  const selectedScheme = schemes[Object.keys(schemes)[Math.floor(Math.random() * Object.keys(schemes).length)]];
+  const schemeNames = Object.keys(schemes);
+  const selected = schemes[schemeNames[Math.floor(Math.random() * schemeNames.length)]];
 
-  return selectedScheme.map((offset, i) => {
-    const hue = (baseHue + offset + 360) % 360;
+  const palette = selected.map((offset, i) => {
+    let hue = (baseHue + offset + 360) % 360;
+
+    if (i === 4) {
+      hue = 30 + Math.random() * 20;
+    }
+
     const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
 
+    // Lightness
     let light;
     switch (i) {
-      case 0: light = 20 + Math.random() * 10; break;
-      case 1: light = 85 + Math.random() * 5; break;
-      default: light = 45 + Math.random() * 25; break;
+      case 0:
+        light = 5 + Math.random() * 15;
+        break;
+      case 1:
+        light = 80 + Math.random() * 15;
+        break;
+      case 2:
+        light = 35 + Math.random() * 20;
+        break;
+      case 3:
+        light = 40 + Math.random() * 30;
+        break;
+      default:
+        light = 45 + Math.random() * 20;
+        break;
     }
+
     return `hsl(${hue}, ${sat}%, ${light}%)`;
   });
+
+  return [...new Set(palette)];
 }
+
 
 function applyColors() {
   const colors = getColorTheoryPalette();
