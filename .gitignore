@@ -8,10 +8,6 @@ bower_components/
 dist/
 build/
 
-# Compiled CSS
-*.css.map
-*.css
-
 # Sass cache
 .sass-cache/
 
