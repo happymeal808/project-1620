@@ -107,12 +107,11 @@ function getColorTheoryPalette() {
     const hue = (baseHue + offset + 360) % 360;
     const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
 
-    // Add a wider lightness range, especially at the extremes
     let light;
     switch (i) {
-      case 0: light = 20 + Math.random() * 10; break; // dark
-      case 1: light = 85 + Math.random() * 5; break;  // light
-      default: light = 45 + Math.random() * 25; break; // mid
+      case 0: light = 20 + Math.random() * 10; break;
+      case 1: light = 85 + Math.random() * 5; break;
+      default: light = 45 + Math.random() * 25; break;
     }
 
     return `hsl(${hue}, ${sat}%, ${light}%)`;
