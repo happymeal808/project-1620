@@ -21,11 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return { block, button };
   });
 
-// === Initialize lock states + attach toggle for all lock buttons ===
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-// === Randomizer Button ===
+// === randomizer ===
   document.getElementById('randomizer').addEventListener('click', () => {
     fetch(apiUrl)
       .then(res => res.json())
@@ -33,21 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const fonts = data.items;
         const randomFonts = getRandomFonts(fonts, fontLockPairs.length);
 
-// Only update unlocked font groups
         fontLockPairs.forEach(({ button, elements }, index) => {
           if (button.dataset.locked !== 'true') {
             applyFont(elements, randomFonts[index]);
           }
         });
 
-// Only update unlocked color blocks
         applyColors();
       })
       .catch(err => console.error('Font API fetch failed:', err));
   });
 });
 
-// === LOCK INITIALIZATION ===
+// === LOCK ===
 
 function initializeLock(button) {
   if (!button.dataset.locked) {
@@ -58,7 +55,6 @@ function initializeLock(button) {
 
 // === FONT LOGIC ===
 function getRandomFonts(fontList, count) {
-// shuffle
   const array = [...fontList];
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -77,9 +73,9 @@ function applyFont(elements, fontObj) {
     const linkTag = document.createElement('link');
     linkTag.href = fontHref;
     linkTag.rel = 'stylesheet';
+    document.head.appendChild(linkTag);
   }
 
-  // Apply font to all matched elements
   Array.from(elements).forEach(el => {
     if (el && el.style) {
       el.style.fontFamily = `'${fontName}', sans-serif`;
