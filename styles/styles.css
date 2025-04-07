@@ -179,3 +179,17 @@ footer{
         }
     }
 }
+button,
+#randomizer{
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+button:hover{
+    box-shadow: 3px 3px 0 #0003;
+}
+
+button:active,
+#randomizer:active{
+    background-color: #e7d6c5;
+    transition: background-color 0.2s ease;
+}
