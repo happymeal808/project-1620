@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:3001/api/fonts';
+const apiUrl = 'https://spotify-fonts-api-server-production.up.railway.app/api/fonts';
 let fontLockPairs = [];
 let colorLockPairs = [];
 
