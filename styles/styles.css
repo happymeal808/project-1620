@@ -16,16 +16,22 @@ html{
     background-repeat: repeat;
     background-size: 20rem 20rem;
     color: rgb(34, 23, 23);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 body{
     background-color: #f9efe4;
+    padding-bottom: 0.125rem;
     margin: 1rem 0.5rem 5rem;
     max-width: 31.5rem;
     border: .0625rem solid #000;
     transition: box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
+    justify-items: center;
+    align-items: center;
     font-family: "Chicago", sans-serif;
     font-weight: 300;
 
@@ -45,11 +51,24 @@ body{
         height: 2rem;
         cursor: pointer;
     }
+
+    #header-font{
+        font-size: 1.375rem;
+    }
+
+    #sub-header-font{
+        font-size: 1.25rem;
+    }
+
+    #body-font{
+        font-size: 1.125rem;
+    }
+
 }
 
 @media (min-width: 32.8125rem){
     body{
-        margin: 2rem auto;
+        margin: auto auto;
     }
 }
 
@@ -160,6 +179,7 @@ main{
 footer{
     font-family: 'Chicago', sans-serif;
     font-size: 0.875rem;
+    width: 100%;
 
     ul{
         list-style: none;
