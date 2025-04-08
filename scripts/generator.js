@@ -3,7 +3,7 @@ let fontLockPairs = [];
 let colorLockPairs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-// === FONT PAIRS ===
+  // === FONT PAIRS ===
   fontLockPairs = Array.from(document.getElementsByClassName('lock'))
     .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/))
     .map(button => {
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return { button, elements };
     });
 
-// === COLOR PAIRS ===
+  // === COLOR PAIRS ===
   colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
     const block = wrapper.querySelector('.color-block');
     const button = wrapper.querySelector('.lock');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-// === Randomizer Button ===
+  // === Randomizer Button ===
   document.getElementById('randomizer').addEventListener('click', handleRandomizerClick);
 });
 
@@ -63,72 +63,61 @@ function applyFont(elements, fontObj) {
   });
 }
 
-// === COLOR LOGIC ===
-function getColorTheoryPalette() {
-  const baseHue = Math.floor(Math.random() * 360);
-  const saturation = 60 + Math.random() * 30;
+// === COLOR LOGIC (Coolors Style) ===
+function getColorPalette() {
+  const curatedPalettes = [
+    ['#12130f', '#5b9279', '#8fcb9b', '#eae6e5', '#8f8073'],
+    ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51'],
+    ['#0b3954', '#bfd7ea', '#ff6663', '#e0ff4f', '#fe938c'],
+    ['#1d3557', '#457b9d', '#a8dadc', '#f1faee', '#e63946'],
+    ['#2e4057', '#66a182', '#caffbf', '#fdfcdc', '#f5b461']
+  ];
 
-  const schemes = {
-    complementary: [0, 180, 30, 210, 60],
-    triadic: [0, 120, 240, 60, 300],
-    analogous: [-30, 0, 30, 60, 90],
-    tetradic: [0, 90, 180, 270, 135],
-    earthy: [30, 40, 50, 70]
-  };
-
-  const schemeNames = Object.keys(schemes);
-  const selected = schemes[schemeNames[Math.floor(Math.random() * schemeNames.length)]];
-
-  const palette = selected.map((offset, i) => {
-    let hue = (baseHue + offset + 360) % 360;
-
-    if (i === 4) {
-      hue = 30 + Math.random() * 20;
-    }
-
-    const sat = Math.max(50, Math.min(saturation + (Math.random() * 10 - 5), 100));
-
-    let light;
-    switch (i) {
-      case 0:
-        light = 5 + Math.random() * 15;
-        break;
-      case 1:
-        light = 80 + Math.random() * 15;
-        break;
-      case 2:
-        light = 35 + Math.random() * 20;
-        break;
-      case 3:
-        light = 40 + Math.random() * 30;
-        break;
-      default:
-        light = 45 + Math.random() * 20;
-        break;
-    }
-
-    return `hsl(${hue}, ${sat}%, ${light}%)`;
-  });
-
-  return [...new Set(palette)];
+  const base = [...curatedPalettes[Math.floor(Math.random() * curatedPalettes.length)]];
+  return shufflePalette(base);
 }
 
+function shufflePalette(palette) {
+  const copy = [...palette];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+
+  const a = s * Math.min(l, 1 - l);
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(-1, Math.min(Math.min(k - 3, 9 - k), 1));
+    return Math.round(color * 255).toString(16).padStart(2, '0');
+  };
+
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
 
 function applyColors() {
-  const colors = getColorTheoryPalette();
+  const colors = getColorPalette();
 
   colorLockPairs.forEach(({ block, button }, index) => {
     if (button.dataset.locked !== 'true' && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
-      block.style.color = getContrastColor(color);
+      block.style.color = getContrastColorFromHex(color);
     }
   });
 }
 
-function getContrastColor(hslString) {
-  const lightness = parseInt(hslString.match(/\d+/g)[2]);
-  return lightness > 55 ? '#000' : '#fff';
+function getContrastColorFromHex(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 150 ? '#000' : '#fff';
 }
 
 // === LOCK TOGGLE ===
