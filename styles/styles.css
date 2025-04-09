@@ -21,6 +21,10 @@ html{
     flex-direction: column;
 }
 
+html::selection{
+    background-color: pink;
+}
+
 body{
     background-color: #f9efe4;
     padding-bottom: 0.125rem;
