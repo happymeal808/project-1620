@@ -19,9 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('date').textContent = dateString;
     }
 
-    // Initial update
     updateDateTime();
 
-    // Update every second
     setInterval(updateDateTime, 1000);
 });

@@ -63,7 +63,7 @@ function applyFont(elements, fontObj) {
   });
 }
 
-// === COLOR LOGIC (Coolors Style) ===
+// === COLOR LOGIC ===
 function getColorPalette() {
   const curatedPalettes = [
     ['#12130f', '#5b9279', '#8fcb9b', '#eae6e5', '#8f8073'],
