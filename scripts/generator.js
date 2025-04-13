@@ -1,9 +1,7 @@
 const apiUrl = 'https://spotify-fonts-api-server-production.up.railway.app/api/fonts';
-let fontLockPairs = [];
-let colorLockPairs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // === FONT PAIRS ===
+// font pairs
   fontLockPairs = Array.from(document.getElementsByClassName('lock'))
     .filter(btn => btn.previousElementSibling && btn.previousElementSibling.tagName.match(/H[1-6]|P/))
     .map(button => {
@@ -13,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return { button, elements };
     });
 
-  // === COLOR PAIRS ===
-  colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
+// color pairs
+    colorLockPairs = Array.from(document.querySelectorAll('.colors > div')).map(wrapper => {
     const block = wrapper.querySelector('.color-block');
     const button = wrapper.querySelector('.lock');
     return { block, button };
@@ -23,17 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
   fontLockPairs.forEach(({ button }) => initializeLock(button));
   colorLockPairs.forEach(({ button }) => initializeLock(button));
 
-  // === Randomizer Button ===
+  // randomizer
   document.getElementById('randomizer').addEventListener('click', handleRandomizerClick);
 });
 
-// === LOCK INITIALIZATION ===
-function initializeLock(button) {
-  if (!button.dataset.locked) button.dataset.locked = 'false';
-  button.addEventListener('click', () => toggleLock(button));
-}
-
-// === FONT LOGIC ===
+// font logic
 function getRandomFonts(fontList, count) {
   const array = [...fontList];
   for (let i = array.length - 1; i > 0; i--) {
@@ -86,20 +78,6 @@ function shufflePalette(palette) {
   return copy;
 }
 
-function hslToHex(h, s, l) {
-  s /= 100;
-  l /= 100;
-
-  const a = s * Math.min(l, 1 - l);
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(-1, Math.min(Math.min(k - 3, 9 - k), 1));
-    return Math.round(color * 255).toString(16).padStart(2, '0');
-  };
-
-  return `#${f(0)}${f(8)}${f(4)}`;
-}
-
 function applyColors() {
   const colors = getColorPalette();
 
@@ -107,20 +85,18 @@ function applyColors() {
     if (button.dataset.locked !== 'true' && block) {
       const color = colors[index % colors.length];
       block.style.backgroundColor = color;
-      block.style.color = getContrastColorFromHex(color);
     }
   });
 }
 
-function getContrastColorFromHex(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness > 150 ? '#000' : '#fff';
+// LOCK
+// initialize lock state
+function initializeLock(button) {
+  if (!button.dataset.locked) button.dataset.locked = 'false';
+  button.addEventListener('click', () => toggleLock(button));
 }
 
-// === LOCK TOGGLE ===
+// lock toggle
 function toggleLock(button) {
   const img = button.querySelector('img');
   const isLocked = button.dataset.locked === 'true';
@@ -132,7 +108,7 @@ function toggleLock(button) {
   img.alt = isLocked ? 'unlock icon' : 'lock icon';
 }
 
-// === RANDOMIZER HANDLER ===
+// randomizer
 function handleRandomizerClick() {
   fetch(apiUrl)
     .then(res => res.json())
